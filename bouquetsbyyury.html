@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bouquets by Yury — Flowers Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tenor+Sans&family=Italiana&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#0a0806;--deep:#110e0b;--card:#161210;
+  --gold:#c9a96e;--gold-light:#e2c99a;--rose:#d4807a;
+  --cream:#f5efe8;--muted:#7a6f67;--border:rgba(201,169,110,0.18);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--cream);font-family:'Tenor Sans',sans-serif;overflow-x:hidden;}
+
+/* ─── PRELOADER ─── */
+#preloader{position:fixed;inset:0;z-index:9999;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+.pre-petals{position:absolute;inset:0;pointer-events:none;}
+.petal{position:absolute;top:-60px;opacity:0;animation:petalFall linear infinite;}
+@keyframes petalFall{0%{transform:translateY(0) rotate(0deg) scale(0.6);opacity:0;}10%{opacity:0.7;}90%{opacity:0.4;}100%{transform:translateY(110vh) rotate(540deg) scale(1);opacity:0;}}
+.pre-logo{position:relative;z-index:2;text-align:center;padding:0 2rem;}
+.pre-logo .lotus{font-size:3rem;display:block;margin-bottom:1.2rem;animation:lpulse 2s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(201,169,110,0.5));}
+@keyframes lpulse{0%,100%{transform:scale(1);opacity:0.85;}50%{transform:scale(1.08);opacity:1;}}
+.pre-logo h1{font-family:'Italiana',serif;font-size:clamp(1.8rem,6vw,3.8rem);font-weight:400;letter-spacing:0.15em;color:var(--gold);text-shadow:0 0 40px rgba(201,169,110,0.4);opacity:0;animation:fadeUp 1s ease 0.5s forwards;}
+.pre-logo p{font-size:0.72rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--muted);margin-top:0.5rem;opacity:0;animation:fadeUp 1s ease 0.9s forwards;}
+.pre-bar-wrap{margin-top:2.5rem;width:180px;height:1px;background:rgba(201,169,110,0.15);position:relative;overflow:hidden;opacity:0;animation:fadeUp 1s ease 1.1s forwards;}
+.pre-bar{position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:loadBar 2.8s ease 1.3s forwards;}
+@keyframes loadBar{0%{width:0%;}100%{width:100%;}}
+.pre-pct{margin-top:1rem;font-size:0.65rem;letter-spacing:0.3em;color:var(--gold);opacity:0;animation:fadeUp 0.5s ease 1.3s forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+#preloader.hide{animation:preHide 0.9s ease forwards;}
+@keyframes preHide{0%{opacity:1;transform:scale(1);}100%{opacity:0;transform:scale(1.04);pointer-events:none;}}
+
+/* ─── SITE ─── */
+#site{opacity:0;transform:translateY(20px);transition:opacity 0.9s ease,transform 0.9s ease;}
+#site.show{opacity:1;transform:translateY(0);}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 4vw;background:linear-gradient(to bottom,rgba(10,8,6,0.95),transparent);backdrop-filter:blur(2px);transition:background 0.4s,backdrop-filter 0.4s;}
+nav.scrolled{background:rgba(10,8,6,0.97);backdrop-filter:blur(12px);}
+.nav-logo{font-family:'Italiana',serif;font-size:1.3rem;letter-spacing:0.12em;color:var(--gold);text-decoration:none;}
+.nav-links{display:flex;gap:2.2rem;list-style:none;}
+.nav-links a{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--cream);text-decoration:none;opacity:0.7;transition:opacity 0.3s,color 0.3s;}
+.nav-links a:hover{opacity:1;color:var(--gold);}
+.nav-cta{font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--black);background:var(--gold);padding:0.6rem 1.4rem;text-decoration:none;transition:background 0.3s;}
+.nav-cta:hover{background:var(--gold-light);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;-webkit-tap-highlight-color:transparent;z-index:200;}
+.hamburger span{display:block;width:24px;height:1.5px;background:var(--cream);transition:transform 0.35s ease,opacity 0.35s ease;transform-origin:center;}
+.hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+.mobile-menu{display:none;position:fixed;inset:0;z-index:150;background:rgba(10,8,6,0.98);backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.4s ease;}
+.mobile-menu.open{opacity:1;pointer-events:all;}
+.mobile-menu a{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:var(--cream);text-decoration:none;padding:0.7rem 2rem;letter-spacing:0.05em;transition:color 0.3s;-webkit-tap-highlight-color:transparent;}
+.mobile-menu a:hover,.mobile-menu a:active{color:var(--gold);}
+.mobile-menu-cta{margin-top:2rem;background:var(--gold)!important;color:var(--black)!important;font-family:'Tenor Sans',sans-serif!important;font-size:0.7rem!important;letter-spacing:0.3em!important;text-transform:uppercase;padding:1rem 2.5rem!important;}
+.mobile-menu-footer{position:absolute;bottom:3rem;font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--muted);}
+
+/* ─── HERO ─── */
+.hero{min-height:100svh;position:relative;display:flex;align-items:center;overflow:hidden;}
+.hero-photo{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80') center/cover no-repeat;transform:scale(1.18);will-change:transform;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(10,8,6,0.88) 0%,rgba(10,8,6,0.55) 60%,rgba(10,8,6,0.3) 100%);}
+.hero-floral{position:absolute;right:-5vw;top:50%;transform:translateY(-50%);width:min(50vw,620px);opacity:0.07;pointer-events:none;}
+.hero-content{position:relative;z-index:2;padding:0 8vw;max-width:720px;}
+.hero-eyebrow{font-size:0.62rem;letter-spacing:0.5em;text-transform:uppercase;color:var(--gold);margin-bottom:1.4rem;display:flex;align-items:center;gap:1rem;}
+.hero-eyebrow::before{content:'';display:block;width:40px;height:1px;background:var(--gold);}
+.hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3.2rem,8vw,7rem);font-weight:300;line-height:0.93;letter-spacing:-0.01em;color:var(--cream);}
+.hero-h1 em{font-style:italic;color:var(--gold);}
+.hero-h1 span{display:block;font-size:0.38em;font-family:'Tenor Sans',sans-serif;font-style:normal;letter-spacing:0.35em;text-transform:uppercase;color:var(--rose);margin-top:0.7rem;}
+.hero-sub{margin-top:2rem;font-size:0.88rem;line-height:1.95;color:rgba(245,239,232,0.6);max-width:380px;}
+.hero-actions{margin-top:2.5rem;display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap;}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;background:var(--gold);color:var(--black);text-decoration:none;font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;padding:1rem 2.2rem;position:relative;overflow:hidden;transition:background 0.3s;min-height:48px;}
+.btn-primary::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.1);transform:translateX(-101%);transition:transform 0.4s ease;}
+.btn-primary:hover::after{transform:translateX(0);}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--cream);text-decoration:none;font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;padding:1rem 2.2rem;transition:border-color 0.3s,color 0.3s;min-height:48px;}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.scroll-hint{position:absolute;bottom:2rem;right:8vw;display:flex;flex-direction:column;align-items:center;gap:0.5rem;font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);}
+.scroll-line{width:1px;height:60px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollAnim 2s ease infinite;}
+@keyframes scrollAnim{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform:scaleY(1);transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
+
+/* ─── MARQUEE ─── */
+.marquee-strip{background:var(--gold);padding:0.8rem 0;overflow:hidden;white-space:nowrap;}
+.marquee-inner{display:inline-flex;animation:marquee 18s linear infinite;}
+.marquee-inner span{font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--black);padding:0 2.5rem;font-weight:600;}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* ─── SHARED ─── */
+section{padding:8rem 8vw;}
+.section-label{font-size:0.58rem;letter-spacing:0.5em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;}
+.section-label::after{content:'';flex:1;max-width:60px;height:1px;background:var(--gold);opacity:0.5;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5vw,4rem);font-weight:300;line-height:1.08;color:var(--cream);}
+.section-title em{font-style:italic;color:var(--gold);}
+
+/* ─── ABOUT ─── */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.about-visual{position:relative;}
+.img-stack{position:relative;height:520px;}
+.img-stack .img-back{position:absolute;top:0;right:0;width:75%;height:90%;overflow:hidden;border:1px solid var(--border);}
+.img-stack .img-front{position:absolute;bottom:0;left:0;width:68%;height:75%;overflow:hidden;border:1px solid var(--border);z-index:2;}
+.img-stack img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.12);will-change:transform;}
+.about-badge{position:absolute;bottom:-1rem;right:-1rem;width:110px;height:110px;background:var(--gold);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--black);font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;text-align:center;line-height:1.6;font-weight:600;z-index:3;}
+.about-badge strong{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;line-height:1;display:block;}
+.about-text p{font-size:0.92rem;line-height:2;color:rgba(245,239,232,0.6);margin-top:1.8rem;}
+.about-details{margin-top:2.5rem;display:flex;flex-direction:column;gap:0.8rem;}
+.detail-row{display:flex;align-items:center;gap:1rem;font-size:0.72rem;letter-spacing:0.05em;color:rgba(245,239,232,0.55);border-bottom:1px solid rgba(201,169,110,0.08);padding-bottom:0.8rem;}
+.detail-row .icon{font-size:1rem;flex-shrink:0;}
+.detail-row strong{color:var(--cream);margin-left:auto;font-size:0.68rem;letter-spacing:0.1em;}
+
+/* ─── COLLECTIONS ─── */
+.collections-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem;flex-wrap:wrap;gap:1rem;}
+.collections-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
+.collection-card{position:relative;overflow:hidden;cursor:pointer;}
+.collection-card:first-child{grid-row:span 2;}
+.collection-card:first-child .card-photo{height:100%;}
+.card-photo{height:280px;overflow:hidden;}
+.card-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.1);transition:transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform;}
+.collection-card:hover .card-photo img{transform:scale(1.18);}
+.card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,8,6,0.92) 0%,rgba(10,8,6,0.1) 55%);}
+.card-info{position:absolute;bottom:0;left:0;right:0;padding:1.5rem;transform:translateY(4px);transition:transform 0.4s ease;}
+.collection-card:hover .card-info{transform:translateY(0);}
+.card-tag{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:0.4rem;}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:300;color:var(--cream);}
+
+/* ─── HORIZONTAL SCROLL ─── */
+.hscroll-wrapper{position:relative;overflow:hidden;}
+.hscroll-intro{padding:6rem 8vw 3rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;}
+.hscroll-track{display:flex;gap:3px;width:max-content;}
+.hscroll-panel{flex-shrink:0;width:42vw;height:82vh;position:relative;overflow:hidden;}
+.hscroll-panel img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.05);}
+.hscroll-panel::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,8,6,0.85) 0%,transparent 50%);z-index:1;}
+.panel-label{position:absolute;bottom:2.5rem;left:2.5rem;right:2.5rem;z-index:2;}
+.panel-label p{font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;opacity:0;transform:translateY(12px);transition:all 0.4s ease;}
+.panel-label h3{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);opacity:0;transform:translateY(16px);transition:all 0.5s ease 0.08s;}
+.hscroll-panel.active .panel-label p,.hscroll-panel.active .panel-label h3{opacity:1;transform:translateY(0);}
+
+/* ─── PINNED QUOTE ─── */
+.quote-pin{height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;text-align:center;padding:4rem 8vw;}
+.quote-bg-img{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1487530811015-780780169c88?w=1600&q=80') center/cover no-repeat;transform:scale(1.18);will-change:transform;}
+.quote-overlay{position:absolute;inset:0;background:rgba(10,8,6,0.78);}
+.quote-content{position:relative;z-index:2;max-width:900px;}
+.quote-content blockquote{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,4.2rem);font-weight:300;font-style:italic;line-height:1.15;color:var(--cream);}
+.quote-content blockquote .q-line{display:block;overflow:hidden;}
+.quote-content blockquote .q-line span{display:block;}
+.quote-attr{margin-top:2rem;font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);}
+
+/* ─── MOSAIC ─── */
+.mosaic-section{padding:0;}
+.mosaic{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(3,220px);gap:3px;}
+.mosaic-item{overflow:hidden;position:relative;cursor:pointer;}
+.mosaic-item img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.08);transition:transform 0.7s ease;will-change:transform;}
+.mosaic-item:hover img{transform:scale(1.15);}
+.mosaic-item:nth-child(1){grid-column:span 2;grid-row:span 2;}
+.mosaic-item:nth-child(2){grid-column:span 2;}
+.mosaic-item:nth-child(3){grid-column:span 2;}
+.mosaic-item:nth-child(4){grid-column:span 1;}
+.mosaic-item:nth-child(5){grid-column:span 1;}
+.mosaic-item:nth-child(6){grid-column:span 2;}
+.mosaic-item:nth-child(7){grid-column:span 2;}
+.mosaic-item:nth-child(8){grid-column:span 1;}
+.mosaic-overlay{position:absolute;inset:0;background:rgba(10,8,6,0.28);opacity:0;transition:opacity 0.4s;display:flex;align-items:center;justify-content:center;}
+.mosaic-item:hover .mosaic-overlay{opacity:1;}
+.mosaic-overlay span{font-size:2rem;transform:scale(0.7);transition:transform 0.3s;}
+.mosaic-item:hover .mosaic-overlay span{transform:scale(1);}
+
+/* ─── PROCESS ─── */
+.process-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.process-header{margin-bottom:4rem;}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);}
+.step{padding:2.5rem 2rem;border-left:1px solid var(--border);}
+.step:first-child{border-left:none;}
+.step-num{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:300;color:rgba(201,169,110,0.12);line-height:1;margin-bottom:1rem;}
+.step-icon{font-size:1.5rem;margin-bottom:1rem;}
+.step-title{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--cream);margin-bottom:0.7rem;}
+.step-desc{font-size:0.78rem;line-height:1.8;color:rgba(245,239,232,0.45);}
+
+/* ─── BOOKING ─── */
+.booking-section{text-align:center;position:relative;overflow:hidden;}
+.booking-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1561128290-19a03d1a9a33?w=1400&q=70') center/cover no-repeat;opacity:0.07;transform:scale(1.12);will-change:transform;}
+.booking-inner{position:relative;z-index:2;}
+.booking-section .section-label{justify-content:center;}
+.booking-section .section-label::after{display:none;}
+.booking-section .section-label::before{content:'';flex:1;max-width:60px;height:1px;background:var(--gold);opacity:0.5;}
+.booking-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,7vw,6rem);font-weight:300;line-height:1.05;color:var(--cream);margin:1.5rem auto;max-width:700px;}
+.booking-title em{font-style:italic;color:var(--gold);}
+.booking-sub{font-size:0.8rem;line-height:1.9;color:rgba(245,239,232,0.45);max-width:420px;margin:0 auto 2.5rem;}
+.booking-note{margin-top:1.5rem;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);}
+.booking-channels{margin-top:3rem;display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;}
+.channel{display:flex;flex-direction:column;align-items:center;gap:0.4rem;color:rgba(245,239,232,0.5);font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;transition:color 0.3s;min-width:60px;-webkit-tap-highlight-color:transparent;}
+.channel:hover{color:var(--gold);}
+.channel span{font-size:1.6rem;}
+
+/* ─── FOOTER ─── */
+footer{background:var(--deep);border-top:1px solid var(--border);padding:4rem 8vw 2rem;}
+.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:4rem;padding-bottom:3rem;border-bottom:1px solid var(--border);}
+.footer-logo{font-family:'Italiana',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.8rem;}
+.footer-tagline{font-size:0.72rem;line-height:1.9;color:rgba(245,239,232,0.4);max-width:240px;}
+.footer-col h4{font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{font-size:0.78rem;color:rgba(245,239,232,0.45);margin-bottom:0.7rem;line-height:1.6;cursor:pointer;transition:color 0.3s;}
+.footer-col ul li:hover{color:var(--cream);}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:2rem;font-size:0.6rem;color:rgba(245,239,232,0.25);letter-spacing:0.1em;flex-wrap:wrap;gap:0.5rem;}
+
+/* ─── MOBILE ─── */
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none;}
+  .hamburger{display:flex;}
+  .mobile-menu{display:flex;}
+  nav{padding:1.1rem 5vw;}
+  section{padding:4rem 5vw;}
+  .hero{min-height:100svh;align-items:flex-end;}
+  .hero-content{padding:0 6vw 5rem;max-width:100%;}
+  .hero-floral{display:none;}
+  .hero-h1{font-size:clamp(2.8rem,12vw,4.5rem);}
+  .hero-h1 span{font-size:0.3em;letter-spacing:0.2em;}
+  .hero-sub{font-size:0.82rem;max-width:100%;margin-top:1.2rem;}
+  .hero-actions{flex-direction:column;align-items:stretch;gap:0.8rem;margin-top:1.8rem;}
+  .btn-primary,.btn-ghost{text-align:center;padding:1.1rem;font-size:0.65rem;}
+  .scroll-hint{display:none;}
+  .about{grid-template-columns:1fr;gap:2.5rem;}
+  .img-stack{height:300px;}
+  .img-stack .img-back{width:80%;height:88%;}
+  .img-stack .img-front{width:65%;height:72%;}
+  .about-badge{width:90px;height:90px;bottom:-0.5rem;right:-0.5rem;}
+  .about-badge strong{font-size:1.3rem;}
+  .about-text p{font-size:0.85rem;margin-top:1rem;}
+  .detail-row{font-size:0.68rem;flex-wrap:wrap;}
+  .detail-row strong{margin-left:0;width:100%;}
+  .collections-grid{grid-template-columns:1fr 1fr;gap:2px;}
+  .collection-card:first-child{grid-row:span 1;}
+  .card-photo{height:200px;}
+  .card-info{transform:translateY(0);}
+  .card-name{font-size:1.05rem;}
+  .hscroll-intro{padding:3.5rem 5vw 2rem;}
+  .hscroll-panel{width:80vw;height:60vh;}
+  .mosaic-section{display:none;}
+  .quote-pin{height:auto;min-height:70vh;padding:4rem 5vw;}
+  .quote-content blockquote{font-size:clamp(1.6rem,6vw,2.8rem);}
+  .steps{grid-template-columns:1fr 1fr;}
+  .step{padding:1.5rem 1rem;}
+  .step:nth-child(odd){border-left:none;}
+  .step:nth-child(1),.step:nth-child(2){border-bottom:1px solid var(--border);}
+  .step-num{font-size:2.5rem;}
+  .booking-title{font-size:clamp(2.2rem,9vw,3.5rem);}
+  .footer-top{grid-template-columns:1fr;gap:2rem;}
+  .footer-tagline{max-width:100%;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+}
+@media(max-width:420px){
+  .collections-grid{grid-template-columns:1fr;}
+  .collection-card:first-child{grid-column:auto;}
+  .steps{grid-template-columns:1fr;}
+  .step{border-left:none!important;border-bottom:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="pre-petals" id="petalContainer"></div>
+  <div class="pre-logo">
+    <span class="lotus">🌸</span>
+    <h1>Bouquets by Yury</h1>
+    <p>Flowers Shop · San Leandro, CA</p>
+    <div class="pre-bar-wrap"><div class="pre-bar"></div></div>
+    <p class="pre-pct">Arranging your experience…</p>
+  </div>
+</div>
+
+<div id="site">
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">Bouquets by Yury</a>
+  <ul class="nav-links">
+    <li><a href="#collections">Collections</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#booking">Contact</a></li>
+  </ul>
+  <a href="#booking" class="nav-cta">Book Now</a>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#collections" class="menu-link">Collections</a>
+  <a href="#about"       class="menu-link">About</a>
+  <a href="#process"     class="menu-link">Process</a>
+  <a href="#booking"     class="menu-link">Contact</a>
+  <a href="#booking"     class="menu-link mobile-menu-cta">Book Now</a>
+  <span class="mobile-menu-footer">@bouquetsbyyury · San Leandro, CA</span>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-photo" id="heroPhoto"></div>
+  <div class="hero-overlay"></div>
+  <svg class="hero-floral" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="200" cy="200" rx="140" ry="60" fill="none" stroke="#c9a96e" stroke-width="0.5" transform="rotate(0 200 200)"/>
+    <ellipse cx="200" cy="200" rx="140" ry="60" fill="none" stroke="#c9a96e" stroke-width="0.5" transform="rotate(30 200 200)"/>
+    <ellipse cx="200" cy="200" rx="140" ry="60" fill="none" stroke="#c9a96e" stroke-width="0.5" transform="rotate(60 200 200)"/>
+    <ellipse cx="200" cy="200" rx="140" ry="60" fill="none" stroke="#c9a96e" stroke-width="0.5" transform="rotate(90 200 200)"/>
+    <ellipse cx="200" cy="200" rx="140" ry="60" fill="none" stroke="#c9a96e" stroke-width="0.5" transform="rotate(120 200 200)"/>
+    <ellipse cx="200" cy="200" rx="140" ry="60" fill="none" stroke="#c9a96e" stroke-width="0.5" transform="rotate(150 200 200)"/>
+    <circle cx="200" cy="200" r="20" fill="none" stroke="#c9a96e" stroke-width="0.5"/>
+    <circle cx="200" cy="200" r="80" fill="none" stroke="#c9a96e" stroke-width="0.3" stroke-dasharray="4 8"/>
+    <circle cx="200" cy="200" r="160" fill="none" stroke="#c9a96e" stroke-width="0.3" stroke-dasharray="2 12"/>
+  </svg>
+  <div class="hero-content">
+    <p class="hero-eyebrow" id="heroEyebrow">Est. Bay Area, California</p>
+    <h1 class="hero-h1" id="heroH1">
+      Every bloom<br/><em>tells your</em><br/>story.
+      <span>Handcrafted Floral Arrangements</span>
+    </h1>
+    <p class="hero-sub" id="heroSub">Bespoke bouquets for life's most meaningful moments — weddings, graduations, anniversaries, and everyday celebrations.</p>
+    <div class="hero-actions" id="heroActions">
+      <a href="#booking" class="btn-primary">Book an Arrangement</a>
+      <a href="#collections" class="btn-ghost">View Collections</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><div class="scroll-line"></div>Scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span>✦ Roses</span><span>✦ Sunflowers</span><span>✦ Bridal Bouquets</span>
+    <span>✦ Yellow Flowers Day</span><span>✦ Graduaciones</span><span>✦ San Valentín</span>
+    <span>✦ Día de las Madres</span><span>✦ Custom Orders</span><span>✦ San Leandro CA</span>
+    <span>✦ Roses</span><span>✦ Sunflowers</span><span>✦ Bridal Bouquets</span>
+    <span>✦ Yellow Flowers Day</span><span>✦ Graduaciones</span><span>✦ San Valentín</span>
+    <span>✦ Día de las Madres</span><span>✦ Custom Orders</span><span>✦ San Leandro CA</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about">
+    <div class="about-visual" id="aboutVisual">
+      <div class="img-stack">
+        <div class="img-back">
+          <img id="imgBack" src="https://images.unsplash.com/photo-1561128290-19a03d1a9a33?w=800&q=80" alt="Pink roses bouquet" loading="lazy"/>
+        </div>
+        <div class="img-front">
+          <img id="imgFront" src="https://images.unsplash.com/photo-1490750967868-88df5691166a?w=700&q=80" alt="Sunflowers close up" loading="lazy"/>
+        </div>
+      </div>
+      <div class="about-badge"><strong>8K+</strong>Happy<br/>Clients</div>
+    </div>
+    <div class="about-text" id="aboutText">
+      <p class="section-label">Our Story</p>
+      <h2 class="section-title">Flowers crafted<br/>with <em>passion</em><br/>& purpose.</h2>
+      <p>Bouquets by Yury is a boutique floral studio rooted in the heart of the Bay Area. Founded by Yury Lopez, each arrangement is a labor of love — thoughtfully designed, hand-assembled, and delivered with care.</p>
+      <p>From intimate anniversary surprises to grand graduation centerpieces, we pour intention into every stem and petal.</p>
+      <div class="about-details">
+        <div class="detail-row"><span class="icon">📍</span>Location<strong>San Leandro, CA — Bay Area</strong></div>
+        <div class="detail-row"><span class="icon">🚫</span>Delivery<strong>Local Pickup Only (No Shipping)</strong></div>
+        <div class="detail-row"><span class="icon">💳</span>Deposits<strong>Non-Refundable · Secures Your Date</strong></div>
+        <div class="detail-row"><span class="icon">📲</span>Follow Us<strong>@bouquetsbyyury</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTIONS -->
+<section id="collections" style="padding-top:0;">
+  <div class="collections-header">
+    <div>
+      <p class="section-label">Our Work</p>
+      <h2 class="section-title">Signature<br/><em>collections</em></h2>
+    </div>
+    <a href="#booking" class="btn-ghost">Request Custom</a>
+  </div>
+  <div class="collections-grid" id="collectionsGrid">
+    <div class="collection-card">
+      <div class="card-photo">
+        <img src="https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=900&q=80" alt="Red roses arrangement" loading="lazy"/>
+      </div>
+      <div class="card-overlay"></div>
+      <div class="card-info"><p class="card-tag">Signature</p><p class="card-name">Roses & Romance</p></div>
+    </div>
+    <div class="collection-card">
+      <div class="card-photo">
+        <img src="https://images.unsplash.com/photo-1596438459194-f275f413d6ff?w=700&q=80" alt="Yellow sunflowers" loading="lazy"/>
+      </div>
+      <div class="card-overlay"></div>
+      <div class="card-info"><p class="card-tag">Seasonal</p><p class="card-name">Yellow Flowers Day</p></div>
+    </div>
+    <div class="collection-card">
+      <div class="card-photo">
+        <img src="https://images.unsplash.com/photo-1586999768265-24af89630739?w=700&q=80" alt="Pink flowers celebration" loading="lazy"/>
+      </div>
+      <div class="card-overlay"></div>
+      <div class="card-info"><p class="card-tag">Celebration</p><p class="card-name">Graduación</p></div>
+    </div>
+    <div class="collection-card">
+      <div class="card-photo">
+        <img src="https://images.unsplash.com/photo-1519378058457-4c29a0a2efac?w=700&q=80" alt="Valentine roses bouquet" loading="lazy"/>
+      </div>
+      <div class="card-overlay"></div>
+      <div class="card-info"><p class="card-tag">Love</p><p class="card-name">San Valentín</p></div>
+    </div>
+    <div class="collection-card">
+      <div class="card-photo">
+        <img src="https://images.unsplash.com/photo-1522748906645-95d8adfd52c7?w=700&q=80" alt="Mother's Day flowers" loading="lazy"/>
+      </div>
+      <div class="card-overlay"></div>
+      <div class="card-info"><p class="card-tag">Special</p><p class="card-name">Día de las Madres</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HORIZONTAL SCROLL GALLERY -->
+<div class="hscroll-wrapper" id="hscrollWrapper">
+  <div class="hscroll-intro">
+    <div>
+      <p class="section-label">The Studio</p>
+      <h2 class="section-title">A visual<br/><em>journey</em></h2>
+    </div>
+    <p style="font-size:0.72rem;color:var(--muted);max-width:200px;line-height:1.8;">Scroll to explore our floral world →</p>
+  </div>
+  <div class="hscroll-track" id="hscrollTrack">
+    <div class="hscroll-panel active">
+      <img src="https://images.unsplash.com/photo-1487530811015-780780169c88?w=900&q=80" alt="Garden bloom arrangement"/>
+      <div class="panel-label"><p>Arrangement 01</p><h3>Garden Bloom</h3></div>
+    </div>
+    <div class="hscroll-panel">
+      <img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=900&q=80" alt="Pink peonies"/>
+      <div class="panel-label"><p>Arrangement 02</p><h3>Soft Peonies</h3></div>
+    </div>
+    <div class="hscroll-panel">
+      <img src="https://images.unsplash.com/photo-1453904300235-0f2f60be2a76?w=900&q=80" alt="Wild flowers bouquet"/>
+      <div class="panel-label"><p>Arrangement 03</p><h3>Wild & Free</h3></div>
+    </div>
+    <div class="hscroll-panel">
+      <img src="https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=900&q=80" alt="Lavender bouquet"/>
+      <div class="panel-label"><p>Arrangement 04</p><h3>Lavender Dreams</h3></div>
+    </div>
+    <div class="hscroll-panel">
+      <img src="https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?w=900&q=80" alt="White flower arrangement"/>
+      <div class="panel-label"><p>Arrangement 05</p><h3>Pure White</h3></div>
+    </div>
+  </div>
+</div>
+
+<!-- PINNED QUOTE -->
+<div class="quote-pin" id="quotePin">
+  <div class="quote-bg-img" id="quoteBg"></div>
+  <div class="quote-overlay"></div>
+  <div class="quote-content">
+    <blockquote>
+      <span class="q-line"><span id="qLine1">"A flower does not</span></span>
+      <span class="q-line"><span id="qLine2">think of competing with</span></span>
+      <span class="q-line"><span id="qLine3">the flower next to it.</span></span>
+      <span class="q-line"><span id="qLine4">It just <em>blooms.</em>"</span></span>
+    </blockquote>
+    <p class="quote-attr">— The philosophy of Bouquets by Yury</p>
+  </div>
+</div>
+
+<!-- MOSAIC GALLERY -->
+<div class="mosaic-section">
+  <div class="mosaic" id="mosaicGrid">
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1548199396-cd3c84df14f6?w=800&q=80" alt="flower arrangement" loading="lazy"/><div class="mosaic-overlay"><span>🌸</span></div></div>
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1561128290-19a03d1a9a33?w=600&q=80" alt="pink roses" loading="lazy"/><div class="mosaic-overlay"><span>🌹</span></div></div>
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1490750967868-88df5691166a?w=600&q=80" alt="sunflowers" loading="lazy"/><div class="mosaic-overlay"><span>🌻</span></div></div>
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80" alt="colorful bouquet" loading="lazy"/><div class="mosaic-overlay"><span>💐</span></div></div>
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1487530811015-780780169c88?w=500&q=80" alt="floral arrangement" loading="lazy"/><div class="mosaic-overlay"><span>✿</span></div></div>
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=700&q=80" alt="peonies" loading="lazy"/><div class="mosaic-overlay"><span>🌺</span></div></div>
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1453904300235-0f2f60be2a76?w=700&q=80" alt="wild flowers" loading="lazy"/><div class="mosaic-overlay"><span>🌼</span></div></div>
+    <div class="mosaic-item"><img src="https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=500&q=80" alt="lavender" loading="lazy"/><div class="mosaic-overlay"><span>💜</span></div></div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<section id="process" class="process-section">
+  <div class="process-header">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">From vision<br/>to <em>bloom</em></h2>
+  </div>
+  <div class="steps" id="stepsGrid">
+    <div class="step"><div class="step-num">01</div><div class="step-icon">✉️</div><p class="step-title">Reach Out</p><p class="step-desc">DM us on Instagram or TikTok with your event date and floral vision.</p></div>
+    <div class="step"><div class="step-num">02</div><div class="step-icon">💬</div><p class="step-title">Consultation</p><p class="step-desc">We'll discuss colors, styles, and occasions to craft the perfect arrangement.</p></div>
+    <div class="step"><div class="step-num">03</div><div class="step-icon">💳</div><p class="step-title">Deposit & Confirm</p><p class="step-desc">A non-refundable deposit secures your order and date on our calendar.</p></div>
+    <div class="step"><div class="step-num">04</div><div class="step-icon">🌸</div><p class="step-title">Pickup</p><p class="step-desc">Your custom bouquet is hand-assembled fresh and ready for pickup in San Leandro.</p></div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking" class="booking-section">
+  <div class="booking-bg" id="bookingBg"></div>
+  <div class="booking-inner">
+    <p class="section-label">Ready to Begin?</p>
+    <h2 class="booking-title" id="bookingTitle">Let's create something<br/><em>unforgettable</em> together.</h2>
+    <p class="booking-sub">Every bouquet is made to order with love. Reach out to start planning your floral experience — for any occasion, big or small.</p>
+    <a href="https://www.instagram.com/bouquetsbyyury" target="_blank" class="btn-primary">Get in Touch</a>
+    <p class="booking-note">Booking open · Deposits required · No shipping available</p>
+    <div class="booking-channels">
+      <a class="channel" href="https://www.instagram.com/bouquetsbyyury" target="_blank"><span>📸</span>Instagram</a>
+      <a class="channel" href="https://www.tiktok.com/@bouquetsbyyury" target="_blank"><span>🎵</span>TikTok</a>
+      <a class="channel" href="https://www.facebook.com/yury.lopez" target="_blank"><span>👤</span>Facebook</a>
+      <a class="channel" href="tel:+1"><span>📞</span>Call Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">Bouquets by Yury</div>
+      <p class="footer-tagline">Handcrafted floral arrangements for every celebration. Based in San Leandro, CA — serving the greater Bay Area.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Collections</h4>
+      <ul>
+        <li>Roses & Romance</li><li>Yellow Flowers Day</li><li>Graduación</li><li>San Valentín</li><li>Día de las Madres</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Info</h4>
+      <ul>
+        <li>San Leandro, CA · Bay Area</li><li>Local Pickup Only</li><li>Deposits Non-Refundable</li><li>@bouquetsbyyury</li><li>By Yury Lopez</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Bouquets by Yury · All Rights Reserved</span>
+    <span>San Leandro, CA · Bay Area</span>
+  </div>
+</footer>
+
+</div><!-- /#site -->
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── PRELOADER ── */
+const petalContainer = document.getElementById('petalContainer');
+const petalEmojis = ['🌸','🌺','🌹','🌷','✿','❀'];
+const petalCount = window.innerWidth < 480 ? 12 : 22;
+for(let i = 0; i < petalCount; i++){
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.textContent = petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+  p.style.cssText = `left:${Math.random()*100}%;font-size:${0.9+Math.random()*1.2}rem;animation-duration:${4+Math.random()*6}s;animation-delay:${Math.random()*4}s;`;
+  petalContainer.appendChild(p);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('preloader').classList.add('hide');
+    document.getElementById('site').classList.add('show');
+    setTimeout(() => {
+      document.getElementById('preloader').style.display = 'none';
+      initGSAP();
+    }, 900);
+  }, 4200);
+});
+
+/* ── NAV scrolled class ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+/* ── HAMBURGER ── */
+const burger = document.getElementById('hamburger');
+const mMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  const open = mMenu.classList.toggle('open');
+  burger.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+});
+mMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  mMenu.classList.remove('open');
+  burger.classList.remove('open');
+  document.body.style.overflow = '';
+}));
+
+/* ── DRAG SCROLL for hscroll on mobile ── */
+(function(){
+  const track = document.getElementById('hscrollTrack');
+  if(!track) return;
+  let isDown = false, startX, scrollLeft;
+  track.addEventListener('mousedown',  e => { isDown=true; startX=e.pageX-track.offsetLeft; scrollLeft=track.scrollLeft; track.style.cursor='grabbing'; });
+  track.addEventListener('mouseleave', () => { isDown=false; track.style.cursor='grab'; });
+  track.addEventListener('mouseup',    () => { isDown=false; track.style.cursor='grab'; });
+  track.addEventListener('mousemove',  e => { if(!isDown) return; e.preventDefault(); track.scrollLeft = scrollLeft-(e.pageX-track.offsetLeft-startX)*1.5; });
+  if(window.innerWidth <= 768){ track.style.overflowX='auto'; track.style.scrollbarWidth='none'; track.style.cursor='grab'; }
+})();
+
+/* ── ALL GSAP ANIMATIONS ── */
+function initGSAP(){
+  const isMobile = window.innerWidth <= 768;
+
+  /* HERO entrance */
+  gsap.timeline({ defaults:{ ease:'power3.out' } })
+    .from('#heroEyebrow', { y:28, opacity:0, duration:1 })
+    .from('#heroH1',      { y:55, opacity:0, duration:1.1 }, '-=0.55')
+    .from('#heroSub',     { y:25, opacity:0, duration:0.9 }, '-=0.4')
+    .from('#heroActions > *', { y:18, opacity:0, stagger:0.14, duration:0.7 }, '-=0.4');
+
+  /* Hero bg parallax */
+  gsap.to('#heroPhoto', {
+    yPercent: 30, ease:'none',
+    scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:true }
+  });
+
+  /* Hero content fades as you scroll away */
+  gsap.to('.hero-content', {
+    y:-70, opacity:0, ease:'none',
+    scrollTrigger:{ trigger:'.hero', start:'35% top', end:'bottom top', scrub:1.2 }
+  });
+
+  /* ABOUT — dual image parallax at different speeds */
+  if(!isMobile){
+    gsap.fromTo('#imgBack', { scale:1.14 }, { scale:1.0, ease:'none',
+      scrollTrigger:{ trigger:'#about', start:'top bottom', end:'bottom top', scrub:1.5 }
+    });
+    gsap.fromTo('#imgFront', { y:50, scale:1.12 }, { y:-50, scale:1.0, ease:'none',
+      scrollTrigger:{ trigger:'#about', start:'top bottom', end:'bottom top', scrub:2 }
+    });
+  }
+
+  /* About text stagger reveal */
+  gsap.from('#aboutText > *', {
+    y:45, opacity:0, stagger:0.14, duration:1, ease:'power2.out',
+    scrollTrigger:{ trigger:'#aboutText', start:'top 82%', toggleActions:'play none none none' }
+  });
+  gsap.from('.detail-row', {
+    x:-28, opacity:0, stagger:0.08, duration:0.75, ease:'power2.out',
+    scrollTrigger:{ trigger:'.about-details', start:'top 88%', toggleActions:'play none none none' }
+  });
+
+  /* COLLECTIONS grid stagger */
+  gsap.from('#collectionsGrid .collection-card', {
+    y:70, opacity:0, stagger:0.1, duration:0.9, ease:'power2.out',
+    scrollTrigger:{ trigger:'#collectionsGrid', start:'top 82%', toggleActions:'play none none none' }
+  });
+
+  /* Collection images subtle parallax */
+  document.querySelectorAll('.card-photo img').forEach(img => {
+    gsap.fromTo(img, { yPercent:-8 }, { yPercent:8, ease:'none',
+      scrollTrigger:{ trigger:img.closest('.collection-card'), start:'top bottom', end:'bottom top', scrub:1 }
+    });
+  });
+
+  /* HORIZONTAL SCROLL — pin + scrub (desktop only) */
+  if(!isMobile){
+    const track   = document.getElementById('hscrollTrack');
+    const panels  = track.querySelectorAll('.hscroll-panel');
+    const travel  = track.scrollWidth - window.innerWidth;
+
+    gsap.to(track, {
+      x: -travel, ease:'none',
+      scrollTrigger:{
+        trigger:'#hscrollWrapper',
+        start:'top top',
+        end:`+=${travel * 1.3}`,
+        pin:true,
+        scrub:0.8,
+        onUpdate(self){
+          const idx = Math.round(self.progress * (panels.length - 1));
+          panels.forEach((p,i) => p.classList.toggle('active', i === idx));
+        }
+      }
+    });
+
+    /* Inner image subtle counter-parallax */
+    panels.forEach(panel => {
+      gsap.fromTo(panel.querySelector('img'),
+        { scale:1.08 }, { scale:1.0, ease:'none',
+          scrollTrigger:{ trigger:'#hscrollWrapper', start:'top top', end:`+=${travel*1.3}`, scrub:1 }
+        }
+      );
+    });
+  }
+
+  /* QUOTE — bg parallax + lines scrub in */
+  gsap.to('#quoteBg', {
+    yPercent:22, ease:'none',
+    scrollTrigger:{ trigger:'#quotePin', start:'top bottom', end:'bottom top', scrub:1.5 }
+  });
+
+  if(!isMobile){
+    const qTl = gsap.timeline({
+      scrollTrigger:{ trigger:'#quotePin', start:'top 75%', end:'center center', scrub:1.2 }
+    });
+    ['#qLine1','#qLine2','#qLine3','#qLine4'].forEach((sel,i) => {
+      qTl.from(sel, { y:48, opacity:0, duration:1 }, i * 0.25);
+    });
+  } else {
+    gsap.from('.quote-content', {
+      y:35, opacity:0, duration:1, ease:'power2.out',
+      scrollTrigger:{ trigger:'#quotePin', start:'top 82%', toggleActions:'play none none none' }
+    });
+  }
+
+  /* MOSAIC — random stagger reveal */
+  if(!isMobile){
+    gsap.from('#mosaicGrid .mosaic-item', {
+      scale:0.86, opacity:0, stagger:{ amount:0.9, from:'random' }, duration:0.85, ease:'power2.out',
+      scrollTrigger:{ trigger:'#mosaicGrid', start:'top 82%', toggleActions:'play none none none' }
+    });
+    document.querySelectorAll('.mosaic-item img').forEach((img,i) => {
+      gsap.fromTo(img,
+        { yPercent: i%2===0 ? -10 : 10 },
+        { yPercent: i%2===0 ?  10 : -10, ease:'none',
+          scrollTrigger:{ trigger:img.closest('.mosaic-item'), start:'top bottom', end:'bottom top', scrub:1.2 }
+        }
+      );
+    });
+  }
+
+  /* PROCESS steps stagger */
+  gsap.from('#stepsGrid .step', {
+    y:45, opacity:0, stagger:0.14, duration:0.85, ease:'power2.out',
+    scrollTrigger:{ trigger:'#stepsGrid', start:'top 84%', toggleActions:'play none none none' }
+  });
+
+  /* BOOKING bg parallax + title */
+  gsap.to('#bookingBg', {
+    yPercent:28, ease:'none',
+    scrollTrigger:{ trigger:'#booking', start:'top bottom', end:'bottom top', scrub:1.5 }
+  });
+  gsap.from('#bookingTitle', {
+    y:45, opacity:0, duration:1.1, ease:'power2.out',
+    scrollTrigger:{ trigger:'#booking', start:'top 82%', toggleActions:'play none none none' }
+  });
+
+  /* Section label draw-in */
+  gsap.utils.toArray('.section-label').forEach(el => {
+    gsap.from(el, {
+      x:-28, opacity:0, duration:0.8, ease:'power2.out',
+      scrollTrigger:{ trigger:el, start:'top 90%', toggleActions:'play none none none' }
+    });
+  });
+
+  /* Booking channels pop */
+  gsap.from('.booking-channels .channel', {
+    y:20, opacity:0, stagger:0.1, duration:0.7, ease:'back.out(1.4)',
+    scrollTrigger:{ trigger:'.booking-channels', start:'top 88%', toggleActions:'play none none none' }
+  });
+}
+</script>
+</body>
+</html>
